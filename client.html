@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
+        integrity="sha512-5A8nwdMOWrSz20fDsjczgUidUBR8liPYU+WymTZP1lmY9G6Oc7HlZv156XqnsgNUzTyMefFTcsFH/tnJE/+xBg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #ccc;
+        }
+
+        .object-fit-cover {
+            object-fit: cover;
+        }
+
+        .pointer {
+            cursor: pointer;
+            color: rgb(52, 52, 229);
+        }
+
+        .chat-msg {
+            background: rgb(233, 222, 222);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .chat-msg1 {
+            padding: 5px 10px;
+            border-radius: 10px;
+            color: #fff;
+            background: rgb(139, 149, 189);
+        }
+
+        .chat-msg2 {
+            background: rgb(114, 138, 236);
+            padding: 5px 10px;
+            border-radius: 10px;
+            color: #fff;
+        }
+
+        button {
+            border: none;
+            background-color: transparent;
+        }
+
+        .ww {
+            width: 400px;
+
+        }
+
+        #my-chat .msg-item:last-child {
+            animation: msg .3s;
+        }
+
+        @keyframes msg {
+            0% {
+                transform: translate(0, 20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <audio id="notification" src="./sound.mp3"></audio>
+
+    <div class='d-flex justify-content-center align-items-center vh-100'>
+        <div class='ww mx-auto'>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class='d-flex align-items-center gap-3'>
+                        <img height="60px" width="60px" class='rounded-circle object-fit-cover'
+                            src="https://media.istockphoto.com/photos/smiling-indian-man-looking-at-camera-picture-id1270067126?k=20&m=1270067126&s=612x612&w=0&h=ZMo10u07vCX6EWJbVp27c7jnnXM2z-VXLd-4maGePqc="
+                            alt="" />
+                        <div class=''>
+                            <h6 class='m-0'>Md Mahir</h6>
+                            <p class='m-0'>1 min ago</p>
+                        </div>
+                    </div>
+                    <div>
+                        <button> <i class="fa fa-phone me-2 pointer "></i></button>
+                        <button><i class="fa fa-video-camera me-2 pointer  "></i></button>
+                    </div>
+                </div>
+                <div class="card-body mt-2">
+                    <div id="my-chat">
+
+
+                    </div>
+                </div>
+                <div class="card-footer d-flex justify-content-between mt-2 gap-1">
+                    <input id="name" type="text" class='form-control' name="name" placeholder="Name" />
+                    <input id="photo" type="text" class='form-control' name="photo" placeholder="Photo" />
+                    <input id="msg" type="text" class='form-control' name="msg" placeholder="Message" />
+                    <button id="send" class='btn-sm btn btn-primary'>Send</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const name = localStorage.getItem('chat-name');
+
+        document.getElementById('send').onclick = () => {
+            let name = document.getElementById('name').value;
+            let photo = document.getElementById('photo').value;
+            let msg = document.getElementById('msg').value;
+
+            // send name to ls 
+            if (!localStorage.getItem('chat-name')) {
+                localStorage.setItem('chat-name', name);
+            }
+
+            // send data to socket 
+            socket.emit('chat', { name, photo, msg })
+
+            document.getElementById('msg').value = "";
+        }
+
+
+        socket.on('chat-msg', data => {
+            let chat = "";
+            document.getElementById('notification').play();
+
+            data.forEach(item => {
+                if (name === item.name) {
+                    chat += `
+
+                    <div class='d-flex gap-2 mb-2 justify-content-end msg-item' >
+                            
+                                    <p class='chat-msg2 m-0'>${item.msg}</p>
+
+                
+                                
+                                <img height="30px" width="30px" class='rounded-circle object-fit-cover'
+                                src=${item.photo}
+                                alt="" />
+                        </div>
+            
+                
+                `
+                } else {
+                    chat += `
+                    <div class='d-flex mb-2 justify-content-start msg-item' >
+                     
+                            <img height="30px" width="30px" class='rounded-circle object-fit-cover'
+                                src=${item.photo}
+                                alt="" />
+                                &nbsp;
+                                <p class='chat-msg1 m-0'>${item.msg}</p>
+                
+                        </div>
+                
+                `
+                }
+
+            });
+            document.getElementById('my-chat').innerHTML = chat;
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>
