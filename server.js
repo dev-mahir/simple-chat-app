@@ -30,10 +30,6 @@ const io = new Server(server);
 
 
 
-
-
-
-
 io.on("connection", (socket) => {
     console.log("a user connected");
 
@@ -57,7 +53,7 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "client.html"));
+    res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // Mongodb connection
